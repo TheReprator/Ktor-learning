@@ -50,20 +50,15 @@ class UserDatabase : UserDatabaseRepository {
                     users[User.password] = user.password
                 }
             }
-            return rowToUser(statement?.resultedValues?.get(0))
+            return statement?.resultedValues?.map {
+                UserFetch(
+                    it[User.username],
+                    it[User.id]
+                )
+            }?.first()
         }catch (e: Exception){
             throw InvalidDataException(e.localizedMessage)
         }
-    }
-
-    private fun rowToUser(row: ResultRow?): UserFetch? {
-        if (row == null) {
-            return null
-        }
-        return UserFetch(
-            row[User.username],
-            row[User.id]
-        )
     }
 
     override suspend fun updateUser(userName: String, user: UserInsert): Boolean {
