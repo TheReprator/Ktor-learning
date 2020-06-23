@@ -1,0 +1,17 @@
+### GET request with a header
+GET http://localhost:8080/
+Accept: application/json
+
+### GET request with a header
+GET http://localhost:8080/plain
+Accept: application/json
+
+### GET request with a header
+GET http://localhost:8080/returnParam/43
+Accept: application/json
+
+###
+#POST http://127.0.0.1:8080/snippets
+#Content-Type: application/json
+#
+#{"snippet": {"text" : "mysnippet"}}
