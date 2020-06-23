@@ -10,6 +10,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 
 fun Route.getRequest() {
+
     route("/") {
         get("/") {
             call.respond(

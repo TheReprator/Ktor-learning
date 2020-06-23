@@ -2,7 +2,6 @@ package com.firstapp.api
 
 import com.firstapp.crud.UserDatabaseRepository
 import com.firstapp.errors.MissingParameterError
-import com.firstapp.logInfo
 import com.firstapp.modal.UserInsert
 import com.firstapp.modal.response.SuccessResponse
 import io.ktor.application.call
@@ -39,11 +38,10 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
 
         delete("/{username}") {
             val userName = call.parameters["username"] ?: throw MissingParameterError("username")
-            userDatabaseRepository.deleteUser(userName)
             call.respond(
                 HttpStatusCode.OK,
                 SuccessResponse(
-                    "Delete Successfull",
+                    "Delete status is: ${userDatabaseRepository.deleteUser(userName)}",
                     HttpStatusCode.OK.value,
                     "Success"
                 )
@@ -52,12 +50,11 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
 
         post {
             val request = call.receive<UserInsert>()
-            userDatabaseRepository.addUser(request)
 
             call.respond(
                 HttpStatusCode.OK,
                 SuccessResponse(
-                    "record inserted successfully",
+                    userDatabaseRepository.addUser(request),
                     HttpStatusCode.OK.value,
                     "Success"
                 )
@@ -67,24 +64,15 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
         put("/{username}") {
             val userName = call.parameters["username"] ?: throw MissingParameterError("username")
             val request = call.receive<UserInsert>()
-            userDatabaseRepository.updateUser(userName, request)
 
             call.respond(
                 HttpStatusCode.OK,
                 SuccessResponse(
-                    "Update Successfully",
+                    "Update status is ${userDatabaseRepository.updateUser(userName, request)}",
                     HttpStatusCode.OK.value,
                     "Success"
                 )
             )
         }
-/*
-        patch("/{username}") {
-            val userName = call.parameters["username"] ?: throw MissingParameterError("username")
-            val request = call.receive<Map<String, String>>()
-
-            userDatabaseRepository.updateUser(userName, request)
-            call.respond("Update Successfull")
-        }*/
     }
 }

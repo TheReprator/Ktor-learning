@@ -4,9 +4,9 @@ import com.firstapp.modal.UserFetch
 import com.firstapp.modal.UserInsert
 
 interface UserDatabaseRepository {
-    fun getAllUser(): List<UserFetch>
-    fun getUser(username: String): UserFetch
-    fun deleteUser(username: String)
-    fun addUser(user: UserInsert)
-    fun updateUser(username: String, user: UserInsert)
+    suspend fun getAllUser(): List<UserFetch>
+    suspend fun getUser(username: String): UserFetch?
+    suspend fun deleteUser(username: String): Boolean
+    suspend fun addUser(user: UserInsert):UserFetch?
+    suspend fun updateUser(username: String, user: UserInsert): Boolean
 }
