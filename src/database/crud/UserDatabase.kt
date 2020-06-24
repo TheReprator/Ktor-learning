@@ -6,6 +6,7 @@ import com.firstapp.errors.MissingParameterError
 import com.firstapp.modal.UserFetch
 import com.firstapp.modal.UserInsert
 import com.sun.media.sound.InvalidDataException
+import kotlinx.coroutines.CompletableDeferred
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -43,14 +44,15 @@ class UserDatabase : UserDatabaseRepository {
 
     override suspend fun addUser(user: UserInsert): UserFetch? {
         try {
-            var statement: InsertStatement<Number>? = null
+            val statement = CompletableDeferred<InsertStatement<Number>>()
             dbQuery {
-                statement = User.insert { users ->
+                val insertStatement = User.insert { users ->
                     users[User.username] = user.username
                     users[User.password] = user.password
                 }
+                statement.complete(insertStatement)
             }
-            return statement?.resultedValues?.map {
+            return statement.await().resultedValues?.map {
                 UserFetch(
                     it[User.username],
                     it[User.id]
