@@ -53,6 +53,13 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
         post {
             try {
                 val request = call.receive<UserInsert>()
+
+                if(!validateEmail(request.username))
+                    throw InvalidDataException("Invalid email")
+
+                if(!validatePasssword(request.password))
+                    throw InvalidDataException("Invalid password")
+
                 call.respond(
                     HttpStatusCode.OK,
                     SuccessResponse(
