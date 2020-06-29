@@ -11,6 +11,7 @@ import com.firstapp.crud.UserDatabase
 import com.firstapp.database.DatabaseFactory
 import com.firstapp.errors.errorHandler
 import io.ktor.application.install
+import io.ktor.auth.Authentication
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
 import io.ktor.jackson.jackson
@@ -41,6 +42,9 @@ fun main(args: Array<String>) {
             }
         }
 
+        install(Authentication){
+            authenticationForm()
+        }
         install(Routing) {
             getRequest()
             postRequest()

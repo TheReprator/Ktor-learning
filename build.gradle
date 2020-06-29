@@ -40,6 +40,8 @@ dependencies {
 
     implementation "org.postgresql:postgresql:42.2.14"
     implementation "com.zaxxer:HikariCP:3.4.5"
+
+    implementation "io.ktor:ktor-auth:$ktor_version"
 }
 
 task stage(dependsOn: ['installDist'])
