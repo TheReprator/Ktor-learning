@@ -28,6 +28,8 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
 
         get("/{username}") {
             val userName = call.parameters["username"] ?: throw MissingParameterError("username")
+            if(!validateEmail(userName))
+                throw InvalidDataException("Invalid email")
             call.respond(
                 HttpStatusCode.OK,
                 SuccessResponse(
@@ -40,6 +42,10 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
 
         delete("/{username}") {
             val userName = call.parameters["username"] ?: throw MissingParameterError("username")
+
+            if(!validateEmail(userName))
+                throw InvalidDataException("Invalid email")
+
             call.respond(
                 HttpStatusCode.OK,
                 SuccessResponse(
@@ -76,6 +82,15 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
         put("/{username}") {
             val userName = call.parameters["username"] ?: throw MissingParameterError("username")
             val request = call.receive<UserInsert>()
+
+            if(!validateEmail(userName))
+                throw InvalidDataException("Invalid fetch email")
+
+            if(!validateEmail(request.username))
+                throw InvalidDataException("Invalid email in body")
+
+            if(!validatePasssword(request.password))
+                throw InvalidDataException("Invalid password in body")
 
             call.respond(
                 HttpStatusCode.OK,
