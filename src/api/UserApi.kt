@@ -4,9 +4,11 @@ import com.firstapp.crud.UserDatabaseRepository
 import com.firstapp.errors.MissingParameterError
 import com.firstapp.modal.UserInsert
 import com.firstapp.modal.response.SuccessResponse
+import com.sun.media.sound.InvalidDataException
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
+import io.ktor.request.receiveParameters
 import io.ktor.response.respond
 import io.ktor.routing.*
 
@@ -49,16 +51,19 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
         }
 
         post {
-            val request = call.receive<UserInsert>()
-
-            call.respond(
-                HttpStatusCode.OK,
-                SuccessResponse(
-                    userDatabaseRepository.addUser(request),
-                    HttpStatusCode.OK.value,
-                    "Success"
+            try {
+                val request = call.receive<UserInsert>()
+                call.respond(
+                    HttpStatusCode.OK,
+                    SuccessResponse(
+                        userDatabaseRepository.addUser(request),
+                        HttpStatusCode.OK.value,
+                        "Success"
+                    )
                 )
-            )
+            }catch (e: Exception){
+                throw InvalidDataException(e.message)
+            }
         }
 
         put("/{username}") {

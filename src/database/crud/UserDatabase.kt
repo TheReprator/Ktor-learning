@@ -2,7 +2,6 @@ package com.firstapp.crud
 
 import com.firstapp.database.DatabaseFactory.dbQuery
 import com.firstapp.database.User
-import com.firstapp.errors.MissingParameterError
 import com.firstapp.modal.UserFetch
 import com.firstapp.modal.UserInsert
 import com.sun.media.sound.InvalidDataException
@@ -21,24 +20,24 @@ class UserDatabase : UserDatabaseRepository {
         return userFetchList
     }
 
-    override suspend fun getUser(userName: String): UserFetch? {
+    override suspend fun getUser(username: String): UserFetch? {
         return transaction {
             User.select {
-                User.username.eq(userName)
+                User.username.eq(username)
             }.map {
                 UserFetch(it[User.username], it[User.id])
             }.firstOrNull()
         }
     }
 
-    override suspend fun deleteUser(userName: String): Boolean {
-         return transaction {
+    override suspend fun deleteUser(username: String): Boolean {
+        return transaction {
             addLogger(StdOutSqlLogger)
             val deleteResult = User.deleteWhere {
-                User.username eq userName
+                User.username eq username
             }
 
-             deleteResult >= 1
+            deleteResult >= 1
         }
     }
 
@@ -58,17 +57,17 @@ class UserDatabase : UserDatabaseRepository {
                     it[User.id]
                 )
             }?.first()
-        }catch (e: Exception){
+        } catch (e: Exception) {
             throw InvalidDataException(e.localizedMessage)
         }
     }
 
-    override suspend fun updateUser(userName: String, user: UserInsert): Boolean {
-       return transaction {
-            val result = User.update({ User.username eq userName }) {
+    override suspend fun updateUser(username: String, user: UserInsert): Boolean {
+        return transaction {
+            val result = User.update({ User.username eq username }) {
                 it[User.password] = user.password
             }
-           result >= 1
+            result >= 1
         }
     }
 
