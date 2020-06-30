@@ -16,8 +16,8 @@ val PATTERN_PASSWORD: Pattern = Pattern.compile("^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z]
         "[^~\\\\s?<>():;\\'\\\\\\\\\\\"\\|]{8,20}\$")
 
 
-fun validateEmail(email: String)=
+fun validateEmail(email: String?)=
     PATTERN_EMAIL.matcher(email).matches()
 
-fun validatePasssword(password: String)=
+fun validatePasssword(password: String?)=
     PATTERN_PASSWORD.matcher(password).matches()

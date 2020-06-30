@@ -3,6 +3,7 @@ package com.firstapp.api
 import com.firstapp.AUTH_NAME_BASIC
 import com.firstapp.crud.UserDatabaseRepository
 import com.firstapp.errors.MissingParameterError
+import com.firstapp.modal.UserFetch
 import com.firstapp.modal.UserInsert
 import com.firstapp.modal.response.SuccessResponse
 import com.sun.media.sound.InvalidDataException
@@ -59,15 +60,23 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
             )
         }
 
-        post {
+        post<UserInsert>("/") { request ->
+
+            val result: UserFetch? =  userDatabaseRepository.addUser(request)
+
+            call.respond(
+                HttpStatusCode.OK,
+                SuccessResponse(
+                    result,
+                    HttpStatusCode.OK.value,
+                    "Success"
+                )
+            )
+        }
+
+        /*post {
             try {
                 val request = call.receive<UserInsert>()
-
-                if (!validateEmail(request.username))
-                    throw InvalidDataException("Invalid email")
-
-                if (!validatePasssword(request.password))
-                    throw InvalidDataException("Invalid password")
 
                 call.respond(
                     HttpStatusCode.OK,
@@ -80,7 +89,7 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
             } catch (e: Exception) {
                 throw InvalidDataException(e.message)
             }
-        }
+        }*/
 
         put("/{username}") {
             val userName = call.parameters["username"] ?: throw MissingParameterError("username")

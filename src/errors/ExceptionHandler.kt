@@ -9,6 +9,7 @@ import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.uri
 import io.ktor.response.respond
+import java.lang.IllegalArgumentException
 import javax.naming.AuthenticationException
 
 fun StatusPages.Configuration.errorHandler(){
@@ -46,12 +47,12 @@ fun StatusPages.Configuration.errorHandler(){
         )
     }
 
-    status(HttpStatusCode.NotFound) { statusCode ->
+    exception<IllegalArgumentException> { cause ->
         call.respond(
-            HttpStatusCode.NotFound,
+            HttpStatusCode.BadRequest,
             ErrorResponse(
-                "Url not found for ${call.request.uri}",
-                HttpStatusCode.NotFound.value,
+                cause.localizedMessage!!,
+                HttpStatusCode.BadRequest.value,
                 null
             )
         )
@@ -59,9 +60,20 @@ fun StatusPages.Configuration.errorHandler(){
 
     status(HttpStatusCode.Unauthorized) { statusCode ->
         call.respond(
-            HttpStatusCode.NotFound,
+            HttpStatusCode.Unauthorized,
             ErrorResponse(
                 "invalid authentication ${call.request.uri}",
+                HttpStatusCode.Unauthorized.value,
+                null
+            )
+        )
+    }
+
+    status(HttpStatusCode.NotFound) { statusCode ->
+        call.respond(
+            HttpStatusCode.NotFound,
+            ErrorResponse(
+                "Url not found for ${call.request.uri}",
                 HttpStatusCode.NotFound.value,
                 null
             )

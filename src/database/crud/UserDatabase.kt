@@ -1,5 +1,7 @@
 package com.firstapp.crud
 
+import com.firstapp.api.validateEmail
+import com.firstapp.api.validatePasssword
 import com.firstapp.database.DatabaseFactory.dbQuery
 import com.firstapp.database.User
 import com.firstapp.modal.UserFetch
@@ -42,6 +44,10 @@ class UserDatabase : UserDatabaseRepository {
     }
 
     override suspend fun addUser(user: UserInsert): UserFetch? {
+
+        require(validateEmail(user.username)) { "Invalid email." }
+        require(validatePasssword(user.password)) { "Invalid password." }
+
         try {
             val statement = CompletableDeferred<InsertStatement<Number>>()
             dbQuery {
