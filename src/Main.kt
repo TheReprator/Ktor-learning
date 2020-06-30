@@ -11,6 +11,7 @@ import com.firstapp.crud.UserDatabase
 import com.firstapp.database.DatabaseFactory
 import com.firstapp.errors.errorHandler
 import io.ktor.application.install
+import io.ktor.application.log
 import io.ktor.auth.Authentication
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
@@ -24,6 +25,7 @@ import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.util.toMap
 import org.slf4j.event.Level
 
 fun main(args: Array<String>) {
@@ -66,10 +68,18 @@ fun main(args: Array<String>) {
             authenticationForm()
         }
         install(Routing) {
+
+            // Print REST requests into a log
+            trace {
+                application.log.debug(it.buildText())
+                application.log.debug(it.call.request.headers.toMap().toString())
+            }
+
             getRequest()
             postRequest()
             userApi(UserDatabase())
         }
+
     }.also { it.start(wait = true) }
 
 }
