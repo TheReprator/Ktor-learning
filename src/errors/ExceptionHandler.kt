@@ -7,7 +7,9 @@ import io.ktor.application.call
 import io.ktor.features.NotFoundException
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
+import io.ktor.request.uri
 import io.ktor.response.respond
+import javax.naming.AuthenticationException
 
 fun StatusPages.Configuration.errorHandler(){
 
@@ -40,6 +42,28 @@ fun StatusPages.Configuration.errorHandler(){
                 "This endpoint is protected and your secret is invalid",
                 HttpStatusCode.NotFound.value,
                 cause.stackTrace
+            )
+        )
+    }
+
+    status(HttpStatusCode.NotFound) { statusCode ->
+        call.respond(
+            HttpStatusCode.NotFound,
+            ErrorResponse(
+                "Url not found for ${call.request.uri}",
+                HttpStatusCode.NotFound.value,
+                null
+            )
+        )
+    }
+
+    status(HttpStatusCode.Unauthorized) { statusCode ->
+        call.respond(
+            HttpStatusCode.NotFound,
+            ErrorResponse(
+                "invalid authentication ${call.request.uri}",
+                HttpStatusCode.NotFound.value,
+                null
             )
         )
     }
@@ -85,6 +109,16 @@ fun StatusPages.Configuration.errorHandler(){
             ErrorResponse(
                 "Data Not Found ... Maybe The Json Data Is Invalid",
                 HttpStatusCode.InternalServerError.value,
+                cause.stackTrace
+            )
+        )
+    }
+
+    exception<AuthenticationException> { cause ->
+        call.respond(HttpStatusCode.Unauthorized,
+            ErrorResponse(
+                "Invalid auth",
+                HttpStatusCode.NotFound.value,
                 cause.stackTrace
             )
         )

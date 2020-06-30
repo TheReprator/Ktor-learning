@@ -4,6 +4,7 @@ import com.firstapp.errors.SecretInvalidError
 import io.ktor.auth.Authentication
 import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.basic
+import javax.naming.AuthenticationException
 
 private const val AUTH_BASIC_USERNAME = "ktorVikram"
 private const val AUTH_BASIC_PASSWORD = "ktorPassword"
@@ -17,7 +18,7 @@ fun Authentication.Configuration.authenticationForm() {
             if (AUTH_BASIC_USERNAME == credentials.name && AUTH_BASIC_PASSWORD == credentials.password) {
                 UserIdPrincipal(credentials.name)
             } else {
-                throw SecretInvalidError()
+                throw AuthenticationException("invalid basic auth")
             }
         }
     }

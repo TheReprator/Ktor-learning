@@ -1,7 +1,6 @@
 package com.firstapp.api
 
 import com.firstapp.LRequest
-import com.firstapp.logInfo
 import com.firstapp.modal.response.SuccessResponse
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
