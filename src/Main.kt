@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.firstapp.api.getRequest
 import com.firstapp.api.postRequest
 import com.firstapp.api.userApi
+import com.firstapp.auth.authenticationForm
 import com.firstapp.crud.UserDatabase
 import com.firstapp.database.DatabaseFactory
 import com.firstapp.errors.errorHandler
@@ -16,12 +17,7 @@ import io.ktor.auth.Authentication
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
 import io.ktor.jackson.jackson
-import io.ktor.request.accept
-import io.ktor.request.httpMethod
-import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty

@@ -2,12 +2,8 @@
 GET http://localhost:8080/
 Accept: application/json
 
-### GET request with a header
-GET http://localhost:8080/plain
-Accept: application/json
-
-### GET request with a header
-GET http://localhost:8080/returnParam/43
+### DELETE request with a header
+DELETE http://0.0.0.0:8080/user/ee@ee.com
 Accept: application/json
 
 ###
