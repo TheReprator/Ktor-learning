@@ -3,11 +3,11 @@ package com.firstapp.api
 import com.firstapp.auth.AUTH_NAME_BASIC
 import com.firstapp.auth.AUTH_NAME_HASHED
 import com.firstapp.crud.UserDatabaseRepository
+import com.firstapp.errors.InvalidDataException
 import com.firstapp.errors.MissingParameterError
 import com.firstapp.modal.UserFetch
 import com.firstapp.modal.UserInsert
 import com.firstapp.modal.response.SuccessResponse
-import com.sun.media.sound.InvalidDataException
 import io.ktor.application.call
 import io.ktor.auth.UserIdPrincipal
 import io.ktor.auth.authenticate

@@ -2,7 +2,6 @@ package com.firstapp.errors
 
 import com.fasterxml.jackson.core.JsonParseException
 import com.firstapp.modal.response.ErrorResponse
-import com.sun.media.sound.InvalidDataException
 import io.ktor.application.call
 import io.ktor.features.NotFoundException
 import io.ktor.features.StatusPages
@@ -51,7 +50,7 @@ fun StatusPages.Configuration.errorHandler(){
         call.respond(
             HttpStatusCode.BadRequest,
             ErrorResponse(
-                cause.localizedMessage!!,
+                cause.localizedMessage.orEmpty(),
                 HttpStatusCode.BadRequest.value,
                 null
             )
@@ -85,7 +84,7 @@ fun StatusPages.Configuration.errorHandler(){
         call.respond(
             HttpStatusCode.NotFound,
             ErrorResponse(
-                cause.message!!,
+                cause.message.orEmpty(),
                 HttpStatusCode.NotFound.value,
                 cause.stackTrace
             )
@@ -97,7 +96,7 @@ fun StatusPages.Configuration.errorHandler(){
         call.respond(
             HttpStatusCode.BadRequest,
             ErrorResponse(
-                cause.message!!,
+                cause.message ?: " Invalid Data",
                 HttpStatusCode.BadRequest.value
             )
         )
@@ -141,6 +140,17 @@ fun StatusPages.Configuration.errorHandler(){
             HttpStatusCode.NotImplemented,
             ErrorResponse(
                 "This feature is not implemented",
+                HttpStatusCode.NotFound.value,
+                cause.stackTrace
+            )
+        )
+    }
+
+    exception<IllegalStateException> { cause ->
+        call.respond(
+            HttpStatusCode.NotImplemented,
+            ErrorResponse(
+                cause.message.orEmpty(),
                 HttpStatusCode.NotFound.value,
                 cause.stackTrace
             )

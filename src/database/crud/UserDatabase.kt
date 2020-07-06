@@ -4,9 +4,9 @@ import com.firstapp.api.validateEmail
 import com.firstapp.api.validatePasssword
 import com.firstapp.database.DatabaseFactory.dbQuery
 import com.firstapp.database.User
+import com.firstapp.errors.InvalidDataException
 import com.firstapp.modal.UserFetch
 import com.firstapp.modal.UserInsert
-import com.sun.media.sound.InvalidDataException
 import kotlinx.coroutines.CompletableDeferred
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.InsertStatement
