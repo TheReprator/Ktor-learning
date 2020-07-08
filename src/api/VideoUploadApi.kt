@@ -21,10 +21,8 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.lang.IllegalArgumentException
 
-@Location("/uploadVideo")
+@Location("/uploadVideo/{title}")
 class UploadVideo(val title:String)
-
-data class VideoRequest(val title: String, val file: File)
 
 /**
  * Register [Upload] routes.
@@ -36,7 +34,6 @@ fun Route.upload(uploadDir: File) {
      */
     post<UploadVideo> {
         val multipart = call.receiveMultipart()
-       // var title = ""
         var videoFile: File? = null
 
         // Processes each part of the multipart input content of the user
