@@ -1,75 +1,53 @@
 package com.firstapp.errors
 
 import com.fasterxml.jackson.core.JsonParseException
+import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.firstapp.modal.response.ErrorResponse
+import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.features.MissingRequestParameterException
 import io.ktor.features.NotFoundException
 import io.ktor.features.StatusPages
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.uri
+import io.ktor.response.defaultTextContentType
 import io.ktor.response.respond
+import io.ktor.util.pipeline.PipelineContext
 import java.lang.IllegalArgumentException
 import javax.naming.AuthenticationException
 
 fun StatusPages.Configuration.errorHandler(){
 
-    exception<MissingParameterError> { cause ->
-        call.respond(
-            HttpStatusCode.BadRequest,
-            ErrorResponse(
-                "Missing parameter ${cause.name}",
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
+    exception<Throwable> { cause ->
+
+        when (cause) {
+            is MissingParameterError ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is IllegalArgumentException ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is MissingRequestParameterException ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is NotFoundException ->
+                handleException(cause, HttpStatusCode.NotFound)
+            is InvalidDataException ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is MissingKotlinParameterException ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is KotlinNullPointerException ->
+                handleException(cause, HttpStatusCode.ExpectationFailed)
+            is JsonParseException ->
+                handleException(cause, HttpStatusCode.ExpectationFailed)
+            is AuthenticationException ->
+                handleException(cause, HttpStatusCode.Unauthorized)
+            is IllegalStateException ->
+                handleException(cause, HttpStatusCode.ExpectationFailed)
+            else ->
+                handleException(cause)
+        }
     }
 
-    exception<MissingElementError> { cause ->
-        call.respond(
-            HttpStatusCode.InternalServerError,
-            ErrorResponse(
-                "Cannot process your request because of missing ${cause.name}",
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
-    }
-
-    exception<SecretInvalidError> { cause ->
-        call.respond(
-            HttpStatusCode.BadRequest,
-            ErrorResponse(
-                "This endpoint is protected and your secret is invalid",
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
-    }
-
-    exception<IllegalArgumentException> { cause ->
-        call.respond(
-            HttpStatusCode.BadRequest,
-            ErrorResponse(
-                cause.localizedMessage.orEmpty(),
-                HttpStatusCode.BadRequest.value,
-                null
-            )
-        )
-    }
-
-    exception<MissingRequestParameterException> { cause ->
-        call.respond(
-            HttpStatusCode.BadRequest,
-            ErrorResponse(
-                cause.localizedMessage.orEmpty(),
-                HttpStatusCode.BadRequest.value,
-                null
-            )
-        )
-    }
-
-    status(HttpStatusCode.Unauthorized) { statusCode ->
+    status(HttpStatusCode.Unauthorized) { code ->
         call.respond(
             HttpStatusCode.Unauthorized,
             ErrorResponse(
@@ -90,82 +68,20 @@ fun StatusPages.Configuration.errorHandler(){
             )
         )
     }
+}
 
-    exception<NotFoundException> { cause ->
-        cause.printStackTrace()
-        call.respond(
-            HttpStatusCode.NotFound,
-            ErrorResponse(
-                cause.message.orEmpty(),
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
-    }
+private suspend fun PipelineContext<Unit, ApplicationCall>.handleException(cause: Throwable,
+                                                                           httpStatusCode: HttpStatusCode = HttpStatusCode.InternalServerError) {
+    call.defaultTextContentType(ContentType("application", "json"))
 
-    exception<InvalidDataException> { cause ->
-        cause.printStackTrace()
-        call.respond(
-            HttpStatusCode.BadRequest,
-            ErrorResponse(
-                cause.message ?: " Invalid Data",
-                HttpStatusCode.BadRequest.value
-            )
-        )
-    }
+    call.respond(
+        httpStatusCode,
 
-    exception<KotlinNullPointerException> { cause ->
-        call.respond(
-            HttpStatusCode.NotFound,
-            ErrorResponse(
-                "Data Not Found",
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
+        ErrorResponse(
+            "${cause.message.orEmpty()} for url ${call.request.uri}",
+            httpStatusCode.value,
+            httpStatusCode.description,
+            cause.stackTrace
         )
-    }
-
-    exception<JsonParseException> { cause ->
-        cause.printStackTrace()
-        call.respond(
-            HttpStatusCode.InternalServerError,
-            ErrorResponse(
-                "Data Not Found ... Maybe The Json Data Is Invalid",
-                HttpStatusCode.InternalServerError.value,
-                cause.stackTrace
-            )
-        )
-    }
-
-    exception<AuthenticationException> { cause ->
-        call.respond(HttpStatusCode.Unauthorized,
-            ErrorResponse(
-                "Invalid auth",
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
-    }
-
-    exception<Throwable> { cause ->
-        call.respond(
-            HttpStatusCode.NotImplemented,
-            ErrorResponse(
-                "This feature is not implemented",
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
-    }
-
-    exception<IllegalStateException> { cause ->
-        call.respond(
-            HttpStatusCode.NotImplemented,
-            ErrorResponse(
-                cause.message.orEmpty(),
-                HttpStatusCode.NotFound.value,
-                cause.stackTrace
-            )
-        )
-    }
+    )
 }
