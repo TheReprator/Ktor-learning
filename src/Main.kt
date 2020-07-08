@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
 
         install(CallLogging)
         {
-            level = Level.INFO
+            level = Level.TRACE
         }
 
         install(StatusPages) {
@@ -73,5 +73,4 @@ fun main(args: Array<String>) {
 
 }
 
-data class LResponse(val data: String)
 data class LRequest(val id: Int, val name: String)

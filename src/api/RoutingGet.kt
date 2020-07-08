@@ -3,11 +3,13 @@ package com.firstapp.api
 import com.firstapp.errors.MissingParameterError
 import com.firstapp.modal.response.SuccessResponse
 import io.ktor.application.call
+import io.ktor.features.MissingRequestParameterException
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import io.ktor.routing.route
+import io.ktor.util.getOrFail
 
 fun Route.getRequest() {
 
@@ -36,7 +38,7 @@ fun Route.getRequest() {
 
         //Routing Parameters
         get("/returnParam/{min}") {
-            val min = call.parameters["min"] ?: throw MissingParameterError("min")
+            val min = call.parameters.getOrFail("min")
 
             call.respond(
                 HttpStatusCode.OK,
@@ -51,7 +53,8 @@ fun Route.getRequest() {
         //Query Fields
         get("/returnMax") {
             val firstParameter =
-                call.request.queryParameters["firstParameter"] ?: throw MissingParameterError("firstParameter")
+                call.request.queryParameters.getOrFail("firstParameter")
+                //call.request.queryParameters["firstParameter"] ?: throw MissingRequestParameterException("firstParameter")
             val secondParameter =
                 call.request.queryParameters["secondParameter"] ?: throw MissingParameterError("secondParameter")
 

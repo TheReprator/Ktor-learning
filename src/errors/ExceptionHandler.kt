@@ -3,6 +3,7 @@ package com.firstapp.errors
 import com.fasterxml.jackson.core.JsonParseException
 import com.firstapp.modal.response.ErrorResponse
 import io.ktor.application.call
+import io.ktor.features.MissingRequestParameterException
 import io.ktor.features.NotFoundException
 import io.ktor.features.StatusPages
 import io.ktor.http.HttpStatusCode
@@ -47,6 +48,17 @@ fun StatusPages.Configuration.errorHandler(){
     }
 
     exception<IllegalArgumentException> { cause ->
+        call.respond(
+            HttpStatusCode.BadRequest,
+            ErrorResponse(
+                cause.localizedMessage.orEmpty(),
+                HttpStatusCode.BadRequest.value,
+                null
+            )
+        )
+    }
+
+    exception<MissingRequestParameterException> { cause ->
         call.respond(
             HttpStatusCode.BadRequest,
             ErrorResponse(
