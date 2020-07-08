@@ -25,6 +25,7 @@ import io.ktor.util.toMap
 import org.slf4j.event.Level
 
 fun main(args: Array<String>) {
+
     embeddedServer(Netty, 8080) {
 
         DatabaseFactory.init()
@@ -32,15 +33,6 @@ fun main(args: Array<String>) {
         install(CallLogging)
         {
             level = Level.INFO
-            /*format { call ->
-                when (val status = call.response.status() ?: "Unhandled") {
-                    HttpStatusCode.Found -> "$status: ${call.request.httpMethod.value} - ${call.request.uri} " +
-                            "[accept: '${call.request.accept()}'] -> " +
-                            "${call.response.headers[HttpHeaders.Location]}"
-                    else -> "$status: ${call.request.httpMethod.value} - ${call.request.uri} [accept: " +
-                            "'${call.request.accept()}']"
-                }
-            }*/
         }
 
         install(StatusPages) {
