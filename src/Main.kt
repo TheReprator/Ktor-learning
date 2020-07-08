@@ -63,6 +63,7 @@ fun main(args: Array<String>) {
         install(Authentication){
             authenticationForm()
         }
+
         install(Routing) {
 
             // Print REST requests into a log

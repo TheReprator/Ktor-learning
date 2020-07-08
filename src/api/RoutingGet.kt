@@ -3,6 +3,7 @@ package com.firstapp.api
 import com.firstapp.errors.MissingParameterError
 import com.firstapp.modal.response.SuccessResponse
 import io.ktor.application.call
+import io.ktor.auth.authenticate
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
@@ -23,16 +24,18 @@ fun Route.getRequest() {
             )
         }
 
-        get("/plain") {
-            call.respond(
-                HttpStatusCode.OK,
-                SuccessResponse(
-                    "great working",
-                    HttpStatusCode.OK.value,
-                    "Success"
+        /*authenticate(AUTH_NAME_LDAP) {
+            get("/plain") {
+                call.respond(
+                    HttpStatusCode.OK,
+                    SuccessResponse(
+                        "great working with ldap",
+                        HttpStatusCode.OK.value,
+                        "Success"
+                    )
                 )
-            )
-        }
+            }
+        }*/
 
         get("/returnParam/{min}") {
             val min = call.parameters["min"] ?: throw MissingParameterError("min")

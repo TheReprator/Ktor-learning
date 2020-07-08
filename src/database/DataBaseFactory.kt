@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 object DatabaseFactory {
 
     fun init() {
-        //Database.connect(hikari())
+        Database.connect(hikari())
     }
 
     /**
