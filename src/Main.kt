@@ -30,7 +30,7 @@ import java.io.IOException
 
 fun main(args: Array<String>) {
 
-    embeddedServer(Netty, 8081) {
+    embeddedServer(Netty, 8080) {
 
         DatabaseFactory.init()
 

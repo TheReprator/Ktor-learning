@@ -4,14 +4,13 @@ import com.firstapp.modal.response.SuccessResponse
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
-import io.ktor.http.content.forEachPart
+import io.ktor.http.content.readAllParts
 import io.ktor.http.content.streamProvider
 import io.ktor.locations.Location
 import io.ktor.locations.post
 import io.ktor.request.receiveMultipart
 import io.ktor.response.respond
 import io.ktor.routing.Route
-import io.ktor.util.getOrFail
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,49 +18,29 @@ import kotlinx.coroutines.yield
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
-import java.lang.IllegalArgumentException
 
-@Location("/uploadVideo/{title}")
-class UploadVideo(val title:String)
 
-/**
- * Register [Upload] routes.
- */
+@Location("/uploadVideo/{id}")
+class UploadVideo(val id: Int)
+
 fun Route.upload(uploadDir: File) {
-    /**
-     * Registers a POST route for [Upload] that actually read the bits sent from the client and creates a new video
-     * using the [database] and the [uploadDir].
-     */
+
     post<UploadVideo> {
-        val multipart = call.receiveMultipart()
-        var videoFile: File? = null
 
-        // Processes each part of the multipart input content of the user
-        multipart.forEachPart { part ->
-            when (part) {
-                is PartData.FormItem -> {
-                    if (part.name != "title")
-                        throw IllegalArgumentException("Title parameter not found")
-                    //title = part.value
-                }
-                is PartData.FileItem -> {
-                    if (part.name != "file")
-                        throw IllegalArgumentException("file parameter not found")
+        val multipart = call.receiveMultipart().readAllParts()
+        val multiMap = multipart.associateBy { it.name }.toMap()
+        val data = MultPartRequestModal(multiMap)
+        println(data)
 
-                    val ext = File(part.originalFileName).extension
-                    val file = File(uploadDir, "upload-${System.currentTimeMillis()}-${call.parameters.getOrFail("title").hashCode()}.$ext")
-                    part.streamProvider().use { input -> file.outputStream().buffered().use { output -> input.copyToSuspend(output) } }
-                    videoFile = file
-                }
-            }
-
-            part.dispose()
-        }
+        val ext = File(data.file.originalFileName).extension
+        val file = File(uploadDir, "upload-${System.currentTimeMillis()}-${data.file.originalFileName}")
+        data.file.streamProvider()
+            .use { input -> file.outputStream().buffered().use { output -> input.copyToSuspend(output) } }
 
         call.respond(
             HttpStatusCode.OK,
             SuccessResponse(
-                videoFile!!,
+                file,
                 HttpStatusCode.OK.value,
                 "video file stored"
             )
@@ -98,4 +77,12 @@ suspend fun InputStream.copyToSuspend(
         }
         return@withContext bytesCopied
     }
+}
+
+class MultPartRequestModal(map: Map<String?, PartData>) {
+    val file: PartData.FileItem by map
+    val type: PartData.FormItem by map
+    val title: PartData.FormItem by map
+
+    override fun toString() = "${file.originalFileName}, ${type.value}, ${title.value}"
 }

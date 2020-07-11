@@ -14,6 +14,7 @@ import io.ktor.request.uri
 import io.ktor.response.defaultTextContentType
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import java.io.IOException
 import java.lang.IllegalArgumentException
 import javax.naming.AuthenticationException
 
@@ -28,12 +29,16 @@ fun StatusPages.Configuration.errorHandler(){
                 handleException(cause, HttpStatusCode.BadRequest)
             is MissingRequestParameterException ->
                 handleException(cause, HttpStatusCode.BadRequest)
-            is NotFoundException ->
-                handleException(cause, HttpStatusCode.NotFound)
             is InvalidDataException ->
                 handleException(cause, HttpStatusCode.BadRequest)
             is MissingKotlinParameterException ->
                 handleException(cause, HttpStatusCode.BadRequest)
+            is IOException ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is NoSuchElementException ->
+                handleException(cause, HttpStatusCode.BadRequest)
+            is NotFoundException ->
+                handleException(cause, HttpStatusCode.NotFound)
             is KotlinNullPointerException ->
                 handleException(cause, HttpStatusCode.ExpectationFailed)
             is JsonParseException ->
@@ -80,8 +85,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.handleException(cause
         ErrorResponse(
             "${cause.message.orEmpty()} for url ${call.request.uri}",
             httpStatusCode.value,
-            httpStatusCode.description,
-            cause.stackTrace
+            httpStatusCode.description/*,
+            cause.stackTrace*/
         )
     )
 }

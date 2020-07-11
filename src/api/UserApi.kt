@@ -72,7 +72,7 @@ fun Route.userApi(userDatabaseRepository: UserDatabaseRepository) {
             val result: UserFetch? = userDatabaseRepository.addUser(request)
 
             call.respond(
-                HttpStatusCode.OK,
+                HttpStatusCode.Created,
                 SuccessResponse(
                     result,
                     HttpStatusCode.OK.value,
