@@ -17,6 +17,7 @@ import io.ktor.util.pipeline.PipelineContext
 import java.io.IOException
 import java.lang.IllegalArgumentException
 import javax.naming.AuthenticationException
+import javax.naming.SizeLimitExceededException
 
 fun StatusPages.Configuration.errorHandler(){
 
@@ -47,6 +48,8 @@ fun StatusPages.Configuration.errorHandler(){
                 handleException(cause, HttpStatusCode.Unauthorized)
             is IllegalStateException ->
                 handleException(cause, HttpStatusCode.ExpectationFailed)
+            is SizeLimitExceededException ->
+                handleException(cause, HttpStatusCode.PayloadTooLarge)
             else ->
                 handleException(cause)
         }
