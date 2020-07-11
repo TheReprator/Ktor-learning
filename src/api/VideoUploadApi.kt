@@ -18,7 +18,9 @@ import kotlinx.coroutines.yield
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.lang.Exception
 
+const val FILE_LIMIT = 3*1024  //3 MB Limit
 
 @Location("/uploadVideo/{id}")
 class UploadVideo(val id: Int)
@@ -35,8 +37,13 @@ fun Route.upload(uploadDir: File) {
         val ext = File(data.file.originalFileName).extension
         val file = File(uploadDir, "upload-${System.currentTimeMillis()}-${data.file.originalFileName}")
         data.file.streamProvider()
-            .use { input -> file.outputStream().buffered().use { output -> input.copyToSuspend(output) } }
+            .use { input ->
+                file.outputStream().buffered().use { output ->
+                     input.copyToSuspend(output)
+                }
+            }
 
+        file.checkForFileSize()
         call.respond(
             HttpStatusCode.OK,
             SuccessResponse(
@@ -48,6 +55,16 @@ fun Route.upload(uploadDir: File) {
     }
 }
 
+private fun File.checkForFileSize(){
+    val fileSizeInKB = this.length() /1024
+    val fileSizeInMB = fileSizeInKB / 1024
+
+    println("size in KB: ${fileSizeInKB}, MB: $fileSizeInMB")
+    if(fileSizeInKB > FILE_LIMIT){
+        delete()
+        throw Exception("File too large, can't be greater that 3MB")
+    }
+}
 /**
  * Utility boilerplate method that suspending,
  * copies a [this] [InputStream] into an [out] [OutputStream] in a separate thread.
