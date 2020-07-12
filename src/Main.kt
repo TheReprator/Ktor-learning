@@ -4,14 +4,12 @@ import com.fasterxml.jackson.core.util.DefaultIndenter
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
-import com.firstapp.api.getRequest
-import com.firstapp.api.postRequest
-import com.firstapp.api.upload
-import com.firstapp.api.userApi
+import com.firstapp.api.*
 import com.firstapp.auth.authenticationForm
 import com.firstapp.crud.UserDatabase
 import com.firstapp.database.DatabaseFactory
 import com.firstapp.errors.errorHandler
+import com.firstapp.session.sessionLearning
 import io.ktor.application.install
 import io.ktor.application.log
 import io.ktor.auth.Authentication
@@ -23,6 +21,7 @@ import io.ktor.locations.Locations
 import io.ktor.routing.Routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.sessions.Sessions
 import io.ktor.util.toMap
 import org.slf4j.event.Level
 import java.io.File
@@ -56,19 +55,14 @@ fun main(args: Array<String>) {
             }
         }
 
-        // Allows to use classes annotated with @Location to represent URLs.
-        // They are typed, can be constructed to generate URLs, and can be used to register routes.
-        install(Locations)
-
-        install(Authentication){
-            authenticationForm()
+        install(Sessions) {
+            sessionLearning()
         }
 
-        // We create the folder and a [Database] in that folder for the configuration [upload.dir].
-        val uploadDirPath: String = ".multiPartFolder"
-        val uploadDir = File(uploadDirPath)
-        if (!uploadDir.mkdirs() && !uploadDir.exists()) {
-            throw IOException("Failed to create directory ${uploadDir.absolutePath}")
+        install(Locations)
+
+        install(Authentication) {
+            authenticationForm()
         }
 
         install(Routing) {
@@ -82,11 +76,21 @@ fun main(args: Array<String>) {
             getRequest()
             postRequest()
             userApi(UserDatabase())
-            upload(uploadDir)
+            upload(createUploadDirectory())
+            sessionApi()
         }
 
     }.also { it.start(wait = true) }
 
+}
+
+fun createUploadDirectory(): File {
+    val uploadDirPath: String = ".multiPartFolder"
+    val uploadDir = File(uploadDirPath)
+    if (!uploadDir.mkdirs() && !uploadDir.exists()) {
+        throw IOException("Failed to create directory ${uploadDir.absolutePath}")
+    }
+    return uploadDir
 }
 
 data class LRequest(val id: Int, val name: String)

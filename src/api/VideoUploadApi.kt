@@ -1,6 +1,5 @@
 package com.firstapp.api
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.firstapp.modal.response.SuccessResponse
 import io.ktor.application.call
 import io.ktor.http.ContentType
@@ -9,7 +8,6 @@ import io.ktor.http.content.PartData
 import io.ktor.http.content.readAllParts
 import io.ktor.http.content.streamProvider
 import io.ktor.http.defaultForFilePath
-import io.ktor.http.fileExtensions
 import io.ktor.locations.Location
 import io.ktor.locations.post
 import io.ktor.request.receiveMultipart
@@ -40,7 +38,7 @@ fun Route.upload(uploadDir: File) {
         val data = MultPartRequestModal(multiMap)
         println(data)
 
-        if(!checkForImageType(data.file.originalFileName!!))
+        if (!checkForImageType(data.file.originalFileName!!))
             throw Exception("Only image is supported")
 
         val ext = File(data.file.originalFileName).extension
