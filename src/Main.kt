@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.firstapp.api.*
 import com.firstapp.auth.authenticationForm
+import com.firstapp.auth.authenticationJWT
 import com.firstapp.crud.UserDatabase
 import com.firstapp.database.DatabaseFactory
 import com.firstapp.errors.errorHandler
@@ -63,13 +64,13 @@ fun main(args: Array<String>) {
 
         install(Authentication) {
             authenticationForm()
+            authenticationJWT()
         }
 
         install(Routing) {
-
             // Print REST requests into a log
             trace {
-                application.log.debug(it.buildText())
+                //application.log.debug(it.buildText())
                 application.log.debug(it.call.request.headers.toMap().toString())
             }
 
@@ -78,6 +79,7 @@ fun main(args: Array<String>) {
             userApi(UserDatabase())
             upload(createUploadDirectory())
             sessionApi()
+            jwtRequest()
         }
 
     }.also { it.start(wait = true) }

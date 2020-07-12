@@ -43,6 +43,7 @@ dependencies {
     implementation "com.zaxxer:HikariCP:3.4.5"
 
     implementation "io.ktor:ktor-auth:$ktor_version"
+    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
 
     testImplementation "io.ktor:ktor-server-tests:$ktor_version"
 }
